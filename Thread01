@@ -1,0 +1,41 @@
+class Train1 extends Thread {
+    //初始化火车票为100张,必须定义为全局变量(共享变量)
+    private volatile int trainCount = 100;
+
+    @Override
+    public void run() {
+        long start = System.currentTimeMillis();
+        //当票大于0的时候继续卖票
+        while (trainCount > 0) {
+            try {
+                Thread.sleep(50);
+                synchronized (this) {
+                    sale();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("共耗时:"+(end-start)+"毫秒..");
+    }
+
+    public void sale() {
+        if (trainCount>0) {
+            System.out.println("成功卖出第\t" + (100 - trainCount + 1) + "\t张票..");
+            trainCount--;
+        }
+    }
+}
+
+/**
+ * 使用多线程模拟抢票功能
+ */
+public class ThreadBuyTrain {
+    public static void main(String[] args) {
+        //创建线程并启动线程
+        Train1 train1 = new Train1();
+        new Thread(train1, "窗口①").start();
+        new Thread(train1, "窗口②").start();
+    }
+}
