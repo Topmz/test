@@ -1,0 +1,38 @@
+class Single {
+    private static Single single;
+
+    /**
+     * 把无参设置成私有的防止new
+     */
+    private Single() {
+    }
+
+    /**
+     * 如果是静态同步函数则有一个问题,那就是当对象不为空的时候还会上锁资源，降低效率
+     * 所以把synchronized放判断后面
+     *
+     * @return
+     */
+    public static Single getSingle() {
+        if (single == null) {
+            //因为是静态同步函数，所以锁用类.class
+            synchronized (Single.class) {
+                //里面在做一次判断的作用是:当对象还是NULL的时候即使进来了也不用考虑线程安全问题了
+                if (single == null)
+                    single = new Single();
+            }
+        }
+        return single;
+    }
+}
+
+/**
+ * 单例模式测试
+ */
+public class SingleDemo {
+    public static void main(String[] args) {
+        Single s1 = Single.getSingle();
+        Single s2 = Single.getSingle();
+        System.out.println(s1 == s2);
+    }
+}
