@@ -1,0 +1,36 @@
+import java.util.concurrent.CountDownLatch;
+
+/**
+ * 此类能实现计数器功能,可以做出类似join的功能
+ * 场景：我们在玩LOL英雄联盟时会出现十个人不同加载状态，但是最后一个人由于各种原因始终加载不了100%，
+ * 于是游戏系统自动等待所有玩家的状态都准备好，才展现游戏画面。
+ */
+public class CountDownLatchDemo {
+    public static void main(String[] args) {
+        //几个线程初始值就设置为几
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
+        new Thread() {
+            @Override
+            public void run() {
+                System.out.println("子线程开始执行...");
+                //计数器减一次
+                countDownLatch.countDown();
+            }
+        }.start();
+        new Thread(){
+            @Override
+            public void run() {
+                System.out.println("子线程开始执行...");
+                //计数器减一次
+                countDownLatch.countDown();
+            }
+        }.start();
+        try {
+            //await()方法的作用是如果count》0就不往下面执行代码，后面的线程等待
+            countDownLatch.await();
+            System.out.println("主线程开始执行...");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
