@@ -1,0 +1,48 @@
+import java.util.concurrent.Semaphore;
+
+class SonThread extends Thread {
+    Semaphore semaphore;
+
+    @Override
+    public void run() {
+        //获取目前资源数量
+        int count = semaphore.availablePermits();
+        System.out.println("剩余厕所位置:" + count);
+        //当还剩下有资源的时候
+        if (count > 0) {
+            System.out.println(Thread.currentThread()+getName()+"抢到厕所位置.....");
+        } else {
+            System.out.println("没有厕所位置了....");
+        }
+        try {
+            //申请1个资源模拟上厕所
+            semaphore.acquire();
+            System.out.println(Thread.currentThread()+getName()+"正在上厕所...");
+            //模拟上厕所时间
+            Thread.sleep(5000);
+            System.out.println(Thread.currentThread()+getName()+"上完厕所了...");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            //释放资源
+            semaphore.release();
+        }
+    }
+
+    public SonThread(Semaphore semaphore) {
+        this.semaphore = semaphore;
+    }
+}
+
+/**
+ * 使用Semaphore信号量实现阈值占位上厕所的场景
+ */
+public class SemaphoreDemo2 {
+    public static void main(String[] args) {
+        //初始化最多只有三个厕所位资源
+        Semaphore semaphore = new Semaphore(3);
+        for (int i = 0; i < 10; i++) {
+            new SonThread(semaphore).start();
+        }
+    }
+}
