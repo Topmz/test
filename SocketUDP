@@ -1,0 +1,37 @@
+import java.io.IOException;
+import java.net.*;
+
+/**
+ * UDP服务端
+ */
+class UDPServer {
+    public static void main(String[] args) throws IOException {
+        System.out.println("UDP服务端启动....");
+        DatagramSocket ds = new DatagramSocket(8080);
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes, bytes.length);
+        //等待接收的数据，如果没有数据则有一直阻塞，直到有数据发送过来
+        ds.receive(dp);
+        System.out.println("来源:" + dp.getAddress() + ",端口号:" + dp.getPort());
+        String result = new String(dp.getData(), 0, dp.getLength());
+        System.out.println("接收到d数据:" + result);
+        ds.close();
+    }
+}
+
+/**
+ * Socket编程之UDP协议发送数据
+ */
+public class UDPDemo {
+    public static void main(String[] args) throws IOException {
+        System.out.println("UDP客户端启动..");
+        //创建客户端
+        DatagramSocket ds = new DatagramSocket();
+        String data = "宇宙无敌小仙女";
+        byte[] bytes = data.getBytes();
+        DatagramPacket dp = new DatagramPacket(bytes,bytes.length, InetAddress.getByName("127.0.0.1"),8080);
+        ds.send(dp);
+        System.out.println("UDP客户端发送数据"+data+"成功..");
+        ds.close();
+    }
+}
