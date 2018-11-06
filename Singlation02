@@ -1,0 +1,25 @@
+class SinglationDemo1 {
+    //必须设置成静态的，加载.class文件的时候就实例化了且只实例化一次
+    private static SinglationDemo1 s1 = new SinglationDemo1();
+
+    //构造函数一定要定义为私有的防止new对象
+    private SinglationDemo1() {
+
+    }
+
+    //直接返回实例化的对象,作用域不能是private
+    public static SinglationDemo1 getSinglationDemo1() {
+        return s1;
+    }
+}
+
+/**
+ * 饿汉式单例模式
+ */
+public class SinglationDemo2 {
+    public static void main(String[] args) {
+        SinglationDemo1 s1 = SinglationDemo1.getSinglationDemo1();
+        SinglationDemo1 s2 = SinglationDemo1.getSinglationDemo1();
+        System.out.println(s1==s2);
+    }
+}
