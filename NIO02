@@ -1,0 +1,45 @@
+import java.nio.ByteBuffer;
+
+/**
+ * NIO核心之缓冲区
+ */
+public class NioBufferDemo {
+    public static void main(String[] args) {
+        //通过实例化该类的allocate方法初始化
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+        //position()代表正在操作的下标位置,下一个读或写的位置
+        //limit()限制，代表limit后面的数据不允许读写
+        //capacaty()最大容量
+        System.out.println("初始化下一个的读写位置:"+byteBuffer.position());
+        System.out.println("初始化限制位:"+byteBuffer.limit());
+        System.out.println("最大容量:"+byteBuffer.capacity());
+        System.out.println("---------存数据---------");
+        byteBuffer.put("1234b".getBytes());
+        System.out.println("存数据后下一个的读写位置:"+byteBuffer.position());
+        System.out.println("存数据后的限制位:"+byteBuffer.limit());
+        System.out.println("存数据后的最大容量:"+byteBuffer.capacity());
+        System.out.println("---------取数据---------");
+        //前面也说了，limit长度后面是不能读和写的，flip()方法的作用是把limit的位置改为0，且取完后恢复limit
+        byteBuffer.flip();
+        byte[]bytes = new byte[byteBuffer.limit()];
+        byteBuffer.get(bytes);
+        System.out.println("取数据后下一个的读写位置:"+byteBuffer.position());
+        System.out.println("限制位:"+byteBuffer.limit());
+        System.out.println("最大容量"+byteBuffer.capacity());
+        System.out.println("---------重复取数据---------");
+        //重复读取的时候需要注意不能再次使用,容易有问题，比如下次读取不是从0开始读取，因为flip()是把position设置成0，所以这里不能用flip
+        byteBuffer.rewind();
+        byte[]bytes1 = new byte[byteBuffer.limit()];
+        byteBuffer.get(bytes1);
+        System.out.println("重取数据后下一个的读写位置:"+byteBuffer.position());
+        System.out.println("限制位:"+byteBuffer.limit());
+        System.out.println("最大容量"+byteBuffer.capacity());
+        //调用清空数据的方法其实是把限制位，下一个读写位置还有最大容量给初始化了。
+        System.out.println("---------清空缓冲区---------");
+        byteBuffer.clear();
+        System.out.println("调用清空后下一个的读写位置:"+byteBuffer.position());
+        System.out.println("调用清空后限制位:"+byteBuffer.limit());
+        System.out.println("调用清空后最大容量"+byteBuffer.capacity());
+        System.out.println("调用清空后的数据"+(char)byteBuffer.get(4));
+    }
+}
