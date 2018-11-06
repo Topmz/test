@@ -1,0 +1,52 @@
+class T1 extends Thread{
+    @Override
+    public void run() {
+        System.out.println("我是T1");
+    }
+}
+class T2 extends Thread{
+    private T1 t1;
+    @Override
+    public void run() {
+        try {
+            t1.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("我是T2");
+    }
+
+    public T2(T1 t1) {
+        this.t1 = t1;
+    }
+}
+class T3 extends Thread{
+    private T2 t2;
+    @Override
+    public void run() {
+        try {
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("我是T3");
+    }
+
+    public T3(T2 t2) {
+        this.t2 = t2;
+    }
+}
+/**
+ * 面试题T1必须在T2前执行，T2必须在T3之前执行怎么做？
+ * 需要让哪个线程则把那个线程用构造函数的方式传过去。
+ */
+public class ThreadJoin {
+    public static void main(String[] args) {
+        T1 t1 = new T1();
+        T2 t2 = new T2(t1);
+        T3 t3 = new T3(t2);
+        t1.start();
+        t2.start();
+        t3.start();
+    }
+}
