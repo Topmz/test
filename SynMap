@@ -1,0 +1,18 @@
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 不安全的集合转换成安全的集合
+ */
+public class CollectionsMap {
+    public static void main(String[] args) {
+        //不安全的Map集合
+        Map map = new HashMap();
+        map.put(null,null);
+        //通过使用Collections集合工具类提供的将不安全的集合转换成安全的集合。
+        Map synMap = Collections.synchronizedMap(map);
+        //Collections.synchronizedList(List list);
+        //Collections.synchronizedSet(Set set);
+    }
+}
