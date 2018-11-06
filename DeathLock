@@ -1,0 +1,47 @@
+class Train3 extends Thread {
+    private volatile int trainCount = 100;
+    private Object obj = new Object();
+    public boolean flag = true;
+
+    @Override
+    public void run() {
+        while (trainCount > 0) {
+            if (flag) {
+                while (true) {//模拟线程一直拿到锁，不释放
+                    synchronized (obj) {//使用自定义锁,然后切换成This锁，如果能实现同步则说明是使用的This锁
+                        sale();
+                    }
+                }
+            } else {
+                while (true) {//模拟线程一直拿到锁，不释放
+                    sale();
+                }
+            }
+        }
+    }
+
+    //使用同步函数This锁的方式
+    private synchronized void sale() {
+        synchronized (obj) {
+            if (trainCount > 0) {
+                System.out.println(Thread.currentThread().getName() + "成功出售第:" + (100 - trainCount + 1) + "张票");
+                trainCount--;
+            }
+        }
+    }
+}
+
+/**
+ * 模拟死锁的产生,产生后互相不释放锁导致程序一直卡着不停止。
+ */
+public class ThreadDeathLock {
+    public static void main(String[] args) throws InterruptedException {
+        Train3 train2 = new Train3();
+        Thread t1 = new Thread(train2, "窗口①");
+        Thread t2 = new Thread(train2, "窗口②");
+        t1.start();
+        Thread.sleep(40);//这里需要注意,必须让线程把flag设置成false之前休眠，否则可能在设置期间睡眠导致数据已经执行完成导致看不到效果
+        train2.flag = false;
+        t2.start();
+    }
+}
