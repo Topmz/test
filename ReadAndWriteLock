@@ -1,0 +1,61 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+/**
+ * Java读写锁，写的时候其他线程必须等待，读的时候可以读也可以写
+ */
+public class ThreadReadWriteLock {
+    private static volatile Map<String, Object> map = new HashMap<String, Object>();
+    private static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+    private static Lock r =rwl.readLock();
+    private static Lock w =rwl.writeLock();
+    private static void put(String key,Object value){
+        try {
+            w.lock();
+            System.out.println("开始写入key:" + key + "..");
+            Thread.sleep(100);
+            map.put(key, value);
+            System.out.println("写入key完成:" + key + "，value:" + value + "\n");
+        }catch (Exception e){
+
+        }finally {
+            w.unlock();
+        }
+    }
+    public static void get(String key){
+        try {
+            r.lock();
+            System.out.println("开始读取key:" + key + "..");
+            Thread.sleep(100);
+            map.get(key);
+            System.out.println("读取key:" + key + ",value:" + map.get(key) + "完毕\n");
+        }catch (Exception e){
+
+        }finally {
+            r.unlock();
+        }
+    }
+
+    public static void main(String[] args) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0;i<10;i++){
+                    //写操作
+                    ThreadReadWriteLock.put(i+"",i);
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0;i<10;i++){
+                    //读操作
+                    ThreadReadWriteLock.get(i+"");
+                }
+            }
+        }).start();
+    }
+}
