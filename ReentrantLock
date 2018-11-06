@@ -1,0 +1,107 @@
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class User1 {
+    public String userName;
+    public String sex;
+    public boolean flag = false;
+    //使用JAVA1.5之后出现的Lock锁，是手动上锁，synchronized是自动上锁
+    public Lock lock = new ReentrantLock();
+}
+
+class Product1 extends Thread {
+    private User1 user1;
+    private int count1 = 0;
+    private int runCount = 10;
+    private Condition condition;
+
+    @Override
+    public void run() {
+        while (runCount>0) {
+            try {
+                //开始手动上锁
+                user1.lock.lock();
+                //消费者线程执行的时候生产者等待
+                if(user1.flag) {
+                    //效果等同于Object类的wait（）方法
+                    condition.await();
+                }
+                if (count1 == 0) {
+                    user1.userName = "毛哲";
+                    user1.sex = "男";
+                } else {
+                    user1.userName = "欢欢";
+                    user1.sex = "女";
+                }
+                System.out.println("生产第" + (10 - runCount + 1) + "个对象:" + user1.userName + "\t" + user1.sex);
+                count1 = (count1 + 1) % 2;
+                user1.flag = true;
+                runCount--;
+                //效果类似于Object类的notify()方法
+                condition.signal();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                //释放锁资源
+                user1.lock.unlock();
+            }
+        }
+    }
+
+    public Product1(User1 user1, Condition condition) {
+        this.user1 = user1;
+        this.condition = condition;
+    }
+}
+
+class Customer1 extends Thread {
+    private User1 user1;
+    private int count = 1;
+    private Condition condition;
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                //上锁
+                user1.lock.lock();
+                //判断生产者生产的时候消费者等待
+                if(!user1.flag) {
+                    //效果等同于Object类的wait（）方法
+                    condition.await();
+                }
+                System.out.println("消费第" + count + "个对象:" + user1.userName + "\t" + user1.sex);
+                count++;
+                user1.flag = false;
+                //效果等同于Object类的wait（）方法
+                condition.signal();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                //释放锁资源
+                user1.lock.unlock();
+            }
+        }
+    }
+
+    public Customer1(User1 user1, Condition condition) {
+        this.user1 = user1;
+        this.condition = condition;
+    }
+
+}
+
+/**
+ * 多线程通讯中，模拟生产消费模式必须的有共享对象,共享同一个锁，同一个condition
+ */
+public class ThreadLock {
+    public static void main(String[] args) {
+        User1 user1 = new User1();
+        Condition condition = user1.lock.newCondition();
+        Product1 product1 = new Product1(user1,condition);
+        Customer1 customer1 = new Customer1(user1,condition);
+        product1.start();
+        customer1.start();
+    }
+}
