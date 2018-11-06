@@ -1,0 +1,42 @@
+class ThreadStopDemo extends Thread{
+    private volatile boolean flag = true;
+    @Override
+    public void run() {
+        while (flag) {
+            System.out.println("子线程正在执行..");
+            try {
+                wait();
+            }catch (Exception e){
+                e.printStackTrace();
+                //使用interrupt()方法的时候线程只是中断不会停止
+                setStop();
+            }
+        }
+        System.out.println("子线程执行结束..");
+    }
+    public  void setStop(){
+        flag = false;
+    }
+}
+
+/**
+ * 线程如何停止
+ * 1.使用Stop方法
+ * 2.使用局部锁方式
+ * 3.使用interrupt()方法配合异常中断线程,然后通过2的方式停止线程
+ */
+public class ThreadStop {
+    public static void main(String[] args) {
+        ThreadStopDemo stopDemo = new ThreadStopDemo();
+        System.out.println("主线程开始执行..");
+        stopDemo.start();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //1.stopDemo.stop();;
+        //2.stopDemo.setStop();
+        stopDemo.interrupt();
+    }
+}
