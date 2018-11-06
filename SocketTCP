@@ -1,0 +1,59 @@
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+class TCPServer {
+    public static void main(String[] args) throws IOException {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        System.out.println("TCP服务端启动");
+        ServerSocket ss = new ServerSocket(8080);
+        try {
+            while (true) {
+                Socket accept = ss.accept();
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            InputStream is = accept.getInputStream();
+                            byte[] bytes = new byte[1024];
+                            //读取传过来的字节流
+                            int len = is.read(bytes);
+                            String result = new String(bytes, 0, len);
+                            System.out.println("来源:" + accept.getInetAddress() + ",端口号:" + accept.getPort());
+                            System.out.println("接收到的数据:" + result);
+                            OutputStream os = accept.getOutputStream();
+                            os.write("this is maomao&huanhuan".getBytes());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ss.close();
+        }
+
+    }
+}
+
+/**
+ * 使用TCP通讯,模拟一直可请求
+ */
+public class TCPClient {
+    public static void main(String[] args) throws IOException {
+        System.out.println("TCP客户端启动");
+        Socket socket = new Socket("127.0.0.1", 8080);
+        OutputStream os = socket.getOutputStream();
+        String data = "我是小欢欢...";
+        //传输字节流数据
+        os.write(data.getBytes());
+        socket.close();
+        System.out.println("发送数据:" + data + "成功...");
+    }
+}
