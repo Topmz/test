@@ -1,0 +1,40 @@
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Method;
+
+interface House3 {
+    void saleHouse();
+}
+
+class Userh implements House3 {
+    @Override
+    public void saleHouse() {
+        System.out.println("终于可以买房啦...");
+    }
+}
+
+class CglibProxy implements MethodInterceptor {
+    @Override
+    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+        System.out.println("你买房的事情现在就交给我拉..");
+        Object invoke = methodProxy.invokeSuper(o, objects);
+        System.out.println("帮你买好房拉..");
+        return invoke;
+    }
+}
+
+/**
+ * CGlib动态代理模式,需要导入包asm,和cglib
+ */
+public class CglibProxyDemo {
+    public static void main(String[] args) {
+        CglibProxy cglibProxy = new CglibProxy();
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(Userh.class);
+        enhancer.setCallback(cglibProxy);
+        Userh userh = (Userh) enhancer.create();
+        userh.saleHouse();
+    }
+}
