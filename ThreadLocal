@@ -1,0 +1,32 @@
+class ThreadLocal extends Thread {
+    int count = 0;
+    java.lang.ThreadLocal<Integer> tLocal = new java.lang.ThreadLocal();
+
+    @Override
+    public void run() {
+        for (int i = 0; i < 3; i++) {
+            count++;
+            tLocal.set(count);
+            System.out.println(Thread.currentThread().getName()+":"+tLocal.get());
+        }
+    }
+}
+
+/**
+ * 本地线程（为每一个线程创建一个局部变量）
+ */
+public class LocalThread {
+    public static void main(String[] args) {
+        ThreadLocal local = new ThreadLocal();
+        ThreadLocal local2 = new ThreadLocal();
+        ThreadLocal local3 = new ThreadLocal();
+        //创建三个线程,此时loacl中的count被共享了，如果不想共享则需要创建三个对象，但是不想创建三个对象的方式觉得很麻烦
+        //此时则可以使用ThreadLocal的当时
+        Thread t1 = new Thread(local);
+        Thread t2 = new Thread(local2);
+        Thread t3 = new Thread(local3);
+        t1.start();
+        t2.start();
+        t3.start();
+    }
+}
