@@ -1,0 +1,36 @@
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
+class TestCyclicBarrier extends Thread {
+    //初始化可等待的线程数
+    CyclicBarrier cyclicBarrier;
+    @Override
+    public void run() {
+        System.out.println("子线程开始执行");
+        System.out.println("成功...");
+        try {
+            cyclicBarrier.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+        System.out.println("任务完毕..");
+    }
+
+    public TestCyclicBarrier(CyclicBarrier cyclicBarrier) {
+        this.cyclicBarrier = cyclicBarrier;
+    }
+}
+
+/**
+ * 当线程A执行完毕后，等待其他线程全部执行完任务代码，再统一执行后面的代码
+ */
+public class CyclicBarrierDemo {
+    public static void main(String[] args) {
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(5);
+        for (int i = 0; i < 5; i++) {
+            new TestCyclicBarrier(cyclicBarrier).start();
+        }
+    }
+}
