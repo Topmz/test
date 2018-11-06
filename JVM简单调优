@@ -1,0 +1,35 @@
+import java.io.File;
+import java.io.FileInputStream;
+
+/**
+ * JVM参数调优
+ * -Xms20m -Xmx20m -XX:+PrintGCDetails -XX:+UseSerialGC -XX:+PrintCommandLineFlags -XX:NewRatio=4 -XX:SurvivorRatio=2
+ * -Xms20m 初始化堆内存20M
+ * -Xmx20m 最大堆内存20N
+ * -XX:SurvivorRatio=2 堆内存中新生代和from+to区比例1：1
+ * -XX:NewRatio=4 新生代区和老年代去的比例为1:4
+ */
+public class JVMDemo {
+    public static void main(String[] args) {
+        byte[]bytes1 = new byte[1*1024*1024];
+        System.out.println("申请了1M...");
+        byte[]bytes2 = new byte[1*1024*1024];
+        System.out.println("申请了4M...");
+        jvmInfo();
+        String basePath = System.getProperty("user.dir");
+        String xmlPaht = basePath + "/src/main/resources";
+        System.out.println("url:"+ xmlPaht+"\turl1:");
+    }
+    public static float toM(long memorySize){
+        float memory = memorySize/(1024*1024);
+        return memory;
+    }
+    public static void jvmInfo(){
+        long max = Runtime.getRuntime().maxMemory();
+        System.out.println("maxMemory:"+toM(max));
+        long free = Runtime.getRuntime().freeMemory();
+        System.out.println("freeMemory:"+toM(free));
+        long total = Runtime.getRuntime().totalMemory();
+        System.out.println("totalMemory:"+toM(total));
+    }
+}
