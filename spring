@@ -1,0 +1,56 @@
+ /**
+     * 通过Bean名称获取并实例化Bean对象
+     *
+     * @param beanName
+     * @return
+     */
+    public Object getBean(String beanName) throws DocumentException, ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+        Object o = null;
+        //beanName不能为null
+        if (org.apache.commons.lang3.StringUtils.isEmpty(beanName)) {
+            try {
+                throw new ClassNotFoundException();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        //添加Dom4j解析器
+        SAXReader saxReader = new SAXReader();
+        //获取resources资源文件路径
+        Document read = saxReader.read(this.getClass().getClassLoader().getResource(path));
+        //获得根节点
+        Element rootElement = read.getRootElement();
+        //获得Beans根节点后的所有子节点
+        List<Element> elements = rootElement.elements();
+        for (Element element : elements) {
+            String name = element.getName();
+            //如果不是bean标签则跳过改标签
+            if (!name.equals("bean")) {
+                continue;
+            }
+            //获取Spring.xml配置文件中id的值（bean的值）
+            String id = element.attributeValue("id");
+            //判断是否是需要查找的bean,如果不是则跳过
+            if (!id.equals(beanName)) {
+                continue;
+            }
+            //获取到了对应bean的ClassPath路径
+            String classPath = element.attributeValue("class");
+            //取到对应的字节码类
+            Class<?> clazz = Class.forName(classPath);
+            //获取到对应的实例化对象
+            o = clazz.newInstance();
+            List<Element> attrElements = element.elements();
+            for (Element attr : attrElements) {
+                //获取到属性名和属性值
+                String attrName = attr.attributeValue("name");
+                String attrValue = attr.attributeValue("value");
+                //反射类同时根据属性名获取到反射类属性，并赋值给反射的类
+                Field declaredField = clazz.getDeclaredField(attrName);
+                //授权能通过反射为该类的私有属性赋值
+                declaredField.setAccessible(true);
+                declaredField.set(o, attrValue);
+            }
+        }
+        return o;
+    }
