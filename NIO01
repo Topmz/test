@@ -1,0 +1,26 @@
+import java.nio.ByteBuffer;
+
+/**
+ * NIO使用mark()方法和reset()方法
+ * reset方法的作用就是返回到mark方法标记的下标
+ */
+public class NIOBufferDemo2 {
+    public static void main(String[] args) {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(10);
+        String str = "abcd";
+        byteBuffer.put(str.getBytes());
+        System.out.println("----------读数据----------");
+        byteBuffer.flip();
+        byte[]bytes1 = new byte[byteBuffer.limit()];
+        byteBuffer.get(bytes1,0,2);
+        byteBuffer.mark();
+        System.out.println("使用mark方法标记当前limit位置");
+        System.out.println(new String(bytes1,0,2));
+        System.out.println(byteBuffer.position());
+        System.out.println("使用reset方法返回mark标记的位置");
+        byteBuffer.get(bytes1,2,2);
+        System.out.println(new String(bytes1,2,2));
+        byteBuffer.reset();
+        System.out.println(byteBuffer.position());
+    }
+}
