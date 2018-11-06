@@ -1,0 +1,45 @@
+/**
+ * 创建代理对象
+ */
+interface House {
+    void saleHouse();
+}
+
+/**
+ * 创建需要代理的对象
+ */
+class BuyHouseUser implements House {
+    @Override
+    public void saleHouse() {
+        System.out.println("终于可以买房啦.....");
+    }
+}
+
+/**
+ * 创建代理中介
+ */
+class Proxy implements House {
+    //手动添加需要代理对象
+    private BuyHouseUser user;
+
+    public Proxy(BuyHouseUser user) {
+        this.user = user;
+    }
+
+    @Override
+    public void saleHouse() {
+        System.out.println("你买房的事情可以交给我了...");
+        user.saleHouse();
+        System.out.println("成功帮你购买好了房子...");
+    }
+}
+
+/**
+ * 静态代理模式
+ */
+public class StaticProxyDemo {
+    public static void main(String[] args) {
+        //创建代理商，把手动需要代理的对象传进去，执行方法
+        new Proxy(new BuyHouseUser()).saleHouse();
+    }
+}
