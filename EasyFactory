@@ -1,0 +1,66 @@
+/**
+ * 创建父类接口（汽车类）
+ */
+interface Car {
+    void run();
+}
+
+/**
+ * 创建宝马汽车实现类
+ */
+class BWM implements Car {
+
+    @Override
+    public void run() {
+        System.out.println("我是宝马汽车");
+    }
+}
+
+/**
+ * 创建奔驰汽车实现汽车类
+ */
+class Benchi implements Car {
+
+    @Override
+    public void run() {
+        System.out.println("我是奔驰汽车");
+    }
+}
+
+/**
+ * 当需要创建的对象比较多的时候需要再次切割把每种汽车独立拿出来成工厂
+ */
+class BWMFactory {
+    public Car createBWM() {
+        Car car = new BWM();
+        return car;
+    }
+}
+
+class CarFactory {
+    public Car creatCar(String name) {
+        Car car = null;
+        switch (name) {
+            case "宝马":
+                car = new BWM();
+                break; //必须加上break跳出循环
+            case "奔驰":
+                car = new Benchi();
+                break;//必须加上break跳出循环
+        }
+        return car;
+    }
+}
+
+/**
+ * 简单工厂模式
+ */
+public class SimpleFactoryDemo {
+    public static void main(String[] args) {
+        CarFactory carFactory = new CarFactory();
+        carFactory.creatCar("宝马").run();
+        carFactory.creatCar("奔驰").run();
+        BWMFactory bwmFactory = new BWMFactory();
+        bwmFactory.createBWM().run();
+    }
+}
