@@ -1,0 +1,48 @@
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+interface House1 {
+    void saleOrBuyHouse();
+}
+
+/**
+ * 创建代理类，需要实现InvocationHandle类,和静态代理比较不需要多次创建代理商（虚拟化中介了）
+ */
+class JdkProxy implements InvocationHandler {
+    private Object target;
+
+    public JdkProxy(Object target) {
+        this.target = target;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("你买房可以交给我了....");
+        Object oj = method.invoke(target, args);
+        System.out.println("帮你买房结束了....");
+        return oj;
+    }
+}
+
+class UserBuy implements House1 {
+    @Override
+    public void saleOrBuyHouse() {
+        System.out.println("我终于可以买房啦....");
+    }
+}
+
+/**
+ * 实现JDK动态代理模式
+ */
+public class JDKProxyDemo {
+    public static void main(String[] args) {
+        UserBuy user = new UserBuy();
+        //实例化实现jdk代理的类(虚拟中介)
+        JdkProxy jdkProxy = new JdkProxy(user);
+        //真正执行代理模式的类，返回Obect对象但是可以强转成代理类
+        House1 house1 = (House1) Proxy.newProxyInstance(user.getClass().getClassLoader(), user.getClass().getInterfaces(), jdkProxy);
+        //通过代理类执行方法
+        house1.saleOrBuyHouse();
+    }
+}
